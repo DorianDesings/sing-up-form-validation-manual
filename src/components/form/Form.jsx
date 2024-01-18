@@ -5,10 +5,16 @@ const Form = () => {
 		firstName: '',
 		lastName: '',
 		email: '',
-		password: ''
+		password: '',
+		errors: {
+			firstName: false,
+			lastName: false,
+			email: false,
+			password: false
+		}
 	});
 
-	console.log(formValues);
+	console.log(formValues.errors);
 
 	return (
 		<form onSubmit={handleSubmit}>
@@ -16,9 +22,9 @@ const Form = () => {
 				<input
 					type='text'
 					placeholder='First Name'
-					value={formValues.firstName}
+					name='firstName'
 					onInput={event =>
-						setFormValues({ ...formValues, firstName: event.target.value })
+						changeFormValues(formValues, setFormValues, event.target)
 					}
 				/>
 			</div>
@@ -26,8 +32,9 @@ const Form = () => {
 				<input
 					type='text'
 					placeholder='Last Name'
+					name='lastName'
 					onInput={event =>
-						setFormValues({ ...formValues, lastName: event.target.value })
+						changeFormValues(formValues, setFormValues, event.target)
 					}
 				/>
 			</div>
@@ -35,8 +42,9 @@ const Form = () => {
 				<input
 					type='email'
 					placeholder='Email Address'
+					name='email'
 					onInput={event =>
-						setFormValues({ ...formValues, email: event.target.value })
+						changeFormValues(formValues, setFormValues, event.target)
 					}
 				/>
 			</div>
@@ -44,8 +52,9 @@ const Form = () => {
 				<input
 					type='password'
 					placeholder='Password'
+					name='password'
 					onInput={event =>
-						setFormValues({ ...formValues, password: event.target.value })
+						changeFormValues(formValues, setFormValues, event.target)
 					}
 				/>
 			</div>
@@ -59,6 +68,65 @@ const Form = () => {
 
 const handleSubmit = ev => {
 	ev.preventDefault();
+};
+
+const validateForm = (name, value, formValues, setFormValues) => {
+	const formatedValue = value.trim();
+	const regexOnlyLetters = /^[a-z]+$/;
+	const regexEmail =
+		/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+	// Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character
+	const regexPassword =
+		/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/;
+
+	if (name === 'firstName') {
+		const isValidName = !regexOnlyLetters.test(formatedValue);
+		setFormValues({
+			...formValues,
+			errors: {
+				...formValues.errors,
+				firstName: isValidName
+			}
+		});
+	}
+
+	if (name === 'lastName') {
+		const isValidName = !regexOnlyLetters.test(formatedValue);
+		setFormValues({
+			...formValues,
+			errors: {
+				...formValues.errors,
+				lastName: isValidName
+			}
+		});
+	}
+
+	if (name === 'email') {
+		const isValidEmail = !regexEmail.test(formatedValue);
+		setFormValues({
+			...formValues,
+			errors: {
+				...formValues.errors,
+				email: isValidEmail
+			}
+		});
+	}
+
+	if (name === 'password') {
+		const isValidPassword = !regexPassword.test(formatedValue);
+		setFormValues({
+			...formValues,
+			errors: {
+				...formValues.errors,
+				password: isValidPassword
+			}
+		});
+	}
+};
+
+const changeFormValues = (formValues, setFormValues, { name, value }) => {
+	setFormValues({ ...formValues, [name]: value });
+	validateForm(name, value, formValues, setFormValues);
 };
 
 export default Form;
